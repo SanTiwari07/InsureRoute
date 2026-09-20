@@ -50,13 +50,13 @@ The core mathematical execution environment contains robust, independent modules
 
 #### B. Weather Intelligence Service (`weather_service.py`)
 - **Data Source:** OpenWeatherMap API
-- **Monitoring:** Dynamically queries exact GPS coordinates based on the generated Dijkstra route path.
+- **Monitoring:** Dynamically queries exact GPS coordinates based on the generated A* route path.
 - **Classification:** Evaluates real-time rain volume, wind speed, and severe weather codes to trigger automatic dashboard disruptions.
 
 #### C. Algorithmic Routing Engine (`graph_router.py`)
-- **Library:** NetworkX (directed graph with bidirectional edges)
-- **Algorithm:** Dijkstra's shortest-path
-- **Function:** On anomaly detection or dangerous weather, active edge weights are exponentially penalized, forcing Dijkstra to calculate a safer bypass route.
+- **Library:** NetworkX
+- **Algorithm:** A* search (`f(n) = g(n) + h(n)`), with a GPS-based (Haversine) admissible heuristic for the speed/cost objectives, and `h(n) = 0` (Dijkstra-equivalent) for the safety objective where a geographic heuristic cannot be proven admissible. Ranked alternative routes are produced by re-running A* in a Yen's-algorithm loop.
+- **Function:** On anomaly detection or dangerous weather, the affected checkpoint is excluded from the graph and A* is re-run from scratch, returning a safer bypass route.
 
 #### D. Actuarial Pricing Engine (`insurance_engine.py`)
 - **Formula:** `Base Rate × Risk Loading × Cargo Multiplier × Coverage Multiplier × Cargo Value`
@@ -80,7 +80,7 @@ User Action (React Dashboard)
       
 [FastAPI on Cloud Run] API Gateway
       
-       NetworkX Graph Engine (Calculates initial shortest paths)
+       NetworkX Graph Engine (A* search calculates initial shortest paths)
       
        OpenWeatherMap API (Fetches live coordinate telemetry)
       
