@@ -104,19 +104,22 @@ The ML risk scoring leverages a highly optimized model to predict delays and dis
 
 ---
 
-## 4. Routing Engine: NetworkX
+## 4. Routing Engine: NetworkX + A* Search
 
-InsureRoute uses NetworkX to plot and reroute supply chain graph topologies instantly when nodes fail.
+InsureRoute uses A* search over a NetworkX graph to plot and reroute supply chain topologies instantly when nodes fail.
 
 ### 4.1 Graph Topology & Cargo Constraints
 - **Topology:** Logistics hubs and transport nodes loaded with GPS coordinates.
-- **Constraints:** Heavy logic applied at the edge level. For instance, **Chemicals** are blocked from certain modes due to hazmat restrictions, and **Perishables** are restricted on long-duration sea routes.
+- **Constraints:** Heavy logic applied at the edge level, and enforced *before* search runs (the disallowed edge is never added to the graph). For instance, **Chemicals** are blocked from certain modes due to hazmat restrictions, and **Perishables** are restricted on long-duration sea routes.
 
-### 4.2 Optimization Priorities
-Dijkstra's shortest-path algorithm calculates alternatives, weighted by user priority:
-- **Speed:** Minimizes `total_time_min`
-- **Cost:** Minimizes `total_cost_inr`
-- **Safety:** Weighs time against the number of transfers and live risk factors.
+### 4.2 A* Search: `f(n) = g(n) + h(n)`
+InsureRoute's primary route-search algorithm is **A\***, not plain Dijkstra. `g(n)` is the real accumulated cost from the origin; `h(n)` is an estimate of the remaining cost to the destination, derived from the great-circle (Haversine) distance between each node's GPS coordinates:
+
+- **Speed:** minimizes `total_time_min`; `h(n)` = great-circle distance ÷ a conservative maximum plausible speed (900 km/h) — a lower bound on remaining travel time (checked against the topology data by the test suite).
+- **Cost:** minimizes `total_cost_inr`; `h(n)` = great-circle distance × the cheapest ₹/km rate in the network — a lower bound on remaining cost (checked against the topology data by the test suite).
+- **Safety:** weighs time against the number of transfers and live risk factors; `risk_weight` is not a spatial quantity, so `h(n) = 0` is used instead of an unprovable geographic guess — at `h(n)=0`, A* is mathematically identical to Dijkstra, so correctness is preserved.
+
+Because `nx.astar_path` (like Dijkstra) returns only one optimal path per call, ranked route **alternatives** are produced by re-running A* inside the same Yen's-algorithm bookkeeping loop NetworkX's own `shortest_simple_paths` uses internally — A* remains the algorithm doing the actual pathfinding at every step. See [AIML_PROJECT_REPORT.md](AIML_PROJECT_REPORT.md) §6 for the full admissibility proof and design rationale.
 
 ---
 
