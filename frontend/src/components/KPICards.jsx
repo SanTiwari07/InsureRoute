@@ -1,6 +1,10 @@
 import { motion, animate } from 'framer-motion'
 import { useEffect, useRef } from 'react'
+<<<<<<< HEAD
+import { AlertTriangle, Map, Navigation, Cloud } from 'lucide-react'
+=======
 import { AlertTriangle, Shield, Cloud, PiggyBank } from 'lucide-react'
+>>>>>>> bab34a3337a6c33e3f1fd3813bf6d277780772d4
 
 function AnimatedNumber({ value, prefix = '', suffix = '', decimals = 1, className = '' }) {
   const ref = useRef(null)
@@ -26,6 +30,48 @@ function AnimatedNumber({ value, prefix = '', suffix = '', decimals = 1, classNa
 
 const CARDS = [
   {
+<<<<<<< HEAD
+    key: 'weather',
+    label: 'Weather',
+    suffix: '%',
+    icon: Cloud,
+    accent: 'border-t-blue-500',
+    iconColor: 'text-blue-500',
+    desc: 'severity',
+    threshold: (v) => v > 50 ? 'danger' : v > 20 ? 'warning' : 'success',
+  },
+  {
+    key: 'traffic',
+    label: 'Traffic Delay',
+    suffix: 'x',
+    prefix: '',
+    icon: Navigation,
+    accent: 'border-t-warning',
+    iconColor: 'text-warning',
+    desc: 'ratio',
+    threshold: (v) => v > 2 ? 'danger' : v > 1.2 ? 'warning' : 'success',
+  },
+  {
+    key: 'distance',
+    label: 'Distance',
+    suffix: ' km',
+    icon: Map,
+    accent: 'border-t-success',
+    iconColor: 'text-success',
+    desc: 'total route length',
+    threshold: () => 'success',
+  },
+  {
+    key: 'risk',
+    label: 'Current Risk',
+    suffix: '%',
+    icon: AlertTriangle,
+    accent: 'border-t-danger',
+    iconColor: 'text-danger',
+    desc: 'disruption probability',
+    threshold: (v) => v > 60 ? 'danger' : v > 30 ? 'warning' : 'success',
+  },
+=======
     key: 'cargo_value', // Map to a new key or use 'sla' if parent passes it
     label: 'Gross Cargo Value Shielded',
     suffix: '',
@@ -69,6 +115,7 @@ const CARDS = [
     desc: 'High-severity disruptions bypassed',
     threshold: () => 'warning',
   },
+>>>>>>> bab34a3337a6c33e3f1fd3813bf6d277780772d4
 ]
 
 const LEVEL_STYLES = {
